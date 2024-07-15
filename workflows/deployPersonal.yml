@@ -11,7 +11,7 @@ env:
   PYTHON_VERSION: '3.11'
   AWS_REGION: 'eu-west-2'
   # syntax: ${{ x && 'ifTrue' || 'ifFalse'  }}
-  AWS_ACCOUNT: ${{ github.ref_name != 'tech' && '344170542049' || '014764761608'}}
+  AWS_ACCOUNT: ${{ github.ref_name != 'tech' && '1111111111111' || '11111111111111111'}}
   ECR_REPOSITORY: 'lambda-db'
   LAMBDA_FUNCTION_NAME: 'rb-rbcore-depositsoverview-db-changes'
 
