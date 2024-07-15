@@ -1,0 +1,91 @@
+name: Deploying Savings Market Overview Business
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - dev
+      - tech
+  
+env:
+  PYTHON_VERSION: '3.11'
+  AWS_REGION: 'eu-west-2'
+  # syntax: ${{ x && 'ifTrue' || 'ifFalse'  }}
+  AWS_ACCOUNT: ${{ github.ref_name != 'tech' && '344170542049' || '014764761608'}}
+  ECR_REPOSITORY: 'rb-rbcore-lambda-deposits-business'
+  LAMBDA_FUNCTION_NAME: 'rb-rbcore-market-overview-business'
+
+
+# The name of the workflow.
+run-name: ${{ github.event.pull_request.merged == true && format('{0}[{1}]PR_NUMBER:{2}', github.ref_name, github.actor, github.event.number) || format('{0}[{1}]{2}', github.ref_name, github.actor, github.event.head_commit.id) }}
+
+
+permissions:
+  id-token: write
+  contents: read
+
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+    
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{env.PYTHON_VERSION}}    
+
+      - name: Install dependencies
+        run: |
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+      
+      - name: Run tests with coverage
+        run: |
+          pytest --cov=Business tests/unit/Business/
+
+  build_and_push_to_ecr:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2 
+
+      - name: Assume role using OIDC
+        uses: aws-actions/configure-aws-credentials@master
+        with: 
+            aws-region: ${{ env.AWS_REGION }}
+            timeout-minutes: 1
+            role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/rbcore-deploy-role
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ env.ECR_REPOSITORY }}:latest -f Business/Dockerfile Business/
+          docker tag ${{ env.ECR_REPOSITORY }}:latest ${{env.AWS_ACCOUNT}}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:latest
+
+      - name: Log in to AWS ECR
+        run: |
+          aws ecr get-login-password --region ${{env.AWS_REGION}} | docker login --password-stdin --username AWS "${{env.AWS_ACCOUNT}}.dkr.ecr.${{env.AWS_REGION}}.amazonaws.com"
+
+      - name: Push Docker image to ECR
+        run: |
+          docker push ${{env.AWS_ACCOUNT}}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:latest
+
+      - name: Update Lambda function
+        run: |
+          aws lambda update-function-code --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
+            --image-uri ${{env.AWS_ACCOUNT}}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:latest \
+            --region ${{ env.AWS_REGION }}
