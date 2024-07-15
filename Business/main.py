@@ -88,8 +88,6 @@ def loggin_in():
     
     # Select the username box
     id_box = driver.find_element(By.NAME, 'ctl00$body$txtUsername')
-    # Send username information
-    id_box.send_keys('Ama5m63')
     # Select the password box
     id_box = driver.find_element(By.NAME ,'ctl00$body$txtPassword')
     # Send password information
