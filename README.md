@@ -91,8 +91,3 @@ The `Personal` scraper supports Docker-based packaging for local testing or alte
 - Builds the Docker image
 - Tags and pushes the image to a container registry (e.g., Amazon ECR)
 - Can be extended to support Lambda container-based deployment
-
----
-
-## 📁 Project Structure
-
