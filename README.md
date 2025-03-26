@@ -78,9 +78,9 @@ This ensures continuous integration and deployment without manual intervention.
 
 ## 🐳 Docker Support
 
-The `Personal` scraper supports Docker-based packaging for local testing or alternate deployment strategies.
+Both `Business` and `Personal` scrapers supports Docker-based packaging for local testing or alternate deployment strategies.
 
-### File: `Personal/dockerfile`
+### File: `Personal or Business/dockerfile`
 
 - Python runtime environment
 - Installs all dependencies via `requirements.txt`
@@ -90,9 +90,4 @@ The `Personal` scraper supports Docker-based packaging for local testing or alte
 
 - Builds the Docker image
 - Tags and pushes the image to a container registry (e.g., Amazon ECR)
-- Can be extended to support Lambda container-based deployment
-
----
-
-## 📁 Project Structure
-
+- Assigns docker image to any choosen Lambda function

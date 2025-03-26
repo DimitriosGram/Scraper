@@ -10,9 +10,20 @@ provider:
         path: ./
         platform: linux/amd64
 
-functions:
-  demo:
-    timeout: 60
-    memorySize: 2048
-    image:
-      name: img
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+        - s3:GetObject
+      Resource: arn:aws:s3:::your-bucket-name/*
+    - Effect: Allow
+      Action:
+        - events:PutEvents
+      Resource: "*"
+
+  functions:
+    demo:
+      timeout: 60
+      memorySize: 2048
+      image:
+        name: img
