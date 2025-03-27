@@ -132,6 +132,21 @@ Before deploying either pipeline, make sure you have:
 
 ---
 
+## 🤖 Build & Deployment Automation
+
+To streamline deployment and reduce manual work, I created a custom shell script in the [`/script`](./script) directory to fully automate the Docker build-and-deploy process:
+
+- Builds the Docker image
+- Logs into ECR
+- Pushes the image to the correct repository
+- Updates the Lambda function with the new image
+
+This was a manual, multi-step task — so I took the initiative to automate it, saving time and reducing room for human error. It’s now fully integrated into the GitHub Actions pipeline.
+
+> Script: [`build_and_push.sh`](./script/build_and_push.sh)
+
+---
+
 ## 📦 Environment Variables
 These are accessed via .env or injected in the AWS Lambda environment. 
 
