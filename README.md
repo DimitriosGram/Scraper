@@ -1,4 +1,4 @@
-# 🛠️ Serverless Scraper Pipeline — AWS Infrastructure Project
+# 🛠️🚀 Serverless Scraper Pipeline — AWS Infrastructure Project
 
 This project is a **cloud-native, serverless web scraping pipeline** built using **AWS services**, **Serverless Framework**, **Docker**, and **GitHub Actions**. It contains two separate scraping flows:
 
@@ -6,6 +6,32 @@ This project is a **cloud-native, serverless web scraping pipeline** built using
 - **Business Product Scraper**
 
 Each is independently deployed and managed using AWS Lambda, EventBridge, and S3, with automated deployment pipelines and modular infrastructure as code (IaC) setup.
+
+## 🌐 Tech Stack
+- AWS Lambda (container-based)
+- EventBridge (scheduled invocations)
+- S3 (data output)
+- Secrets Manager (secure auth)
+- IAM Roles (least privilege)
+- Serverless Framework (IaC for Personal pipeline)
+- GitHub Actions (CI/CD)
+- Docker (containerization)
+- Python (scraper logic & AWS SDK)
+
+## ✅ Key Features
+⚙️ Modular deployment for Personal and Business scrapers
+
+🐳 Dockerized Lambda functions for full runtime control
+
+🔁 Fully automated CI/CD for Business and Personal pipeline
+
+🔐 Secure secret management using AWS services
+
+📦 Structured IaC using Serverless Framework
+
+📤 Data stored in S3 for external analysis or backup
+
+---
 
 ## 📌 Project Goals
 
@@ -52,8 +78,6 @@ The **Serverless Framework** is used to define and deploy the infrastructure for
   - S3 output configurations
 - Supports fast iteration, consistent deployments, and rollback capabilities
 
-> The `Business` pipeline is currently deployed manually or via CI; it can be migrated to Serverless Framework easily.
-
 ---
 
 ## 🔁 CI/CD – GitHub Actions Workflow
@@ -91,3 +115,48 @@ Both `Business` and `Personal` scrapers supports Docker-based packaging for loca
 - Builds the Docker image
 - Tags and pushes the image to a container registry (e.g., Amazon ECR)
 - Assigns docker image to any choosen Lambda function
+
+---
+  
+## 🚀 Deployment Instructions
+
+🔧 Prerequisites
+Before deploying either pipeline, make sure you have:
+
+- Python 3.11+ (for scraper logic)
+- Docker (for building containerized Lambdas)
+- AWS CLI (for deployment/debugging)
+- **Node.js + npm** (for Serverless Framework CLI only)
+  ```bash
+  npm install -g serverless
+
+---
+
+## 📦 Environment Variables
+These are accessed via .env or injected in the AWS Lambda environment. 
+
+Required variables:
+
+- AWS_BUCKET	Name of the target S3 bucket
+- MF_username	Username for MoneyFacts (very important)
+- Secrets (AWS)	Stored in Secrets Manager, e.g. MoneyFactsLogin
+
+🔐 Secrets like passwords should not be hardcoded. They're retrieved securely from AWS Secrets Manager using boto3.
+
+---
+
+## 📁 Deploying via CI/CD (Business or Personal Scraper)
+The Business or Personal scraper is deployed automatically via GitHub Actions:
+
+- Triggered on pushes to ```dev``` or ```main``` branches
+- Or manually via workflow dispatch
+
+CI/CD handles:
+
+- Testing with pytest
+- Docker build/tag/push to ECR
+- Lambda update with new container image
+
+To run tests locally:
+
+```pytest tests/unit/Business/```
